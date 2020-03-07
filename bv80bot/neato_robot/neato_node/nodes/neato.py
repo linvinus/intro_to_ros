@@ -116,7 +116,10 @@ class NeatoNode:
             scan.header.stamp = rospy.Time.now()
            
             self.robot.requestScan()
-            scan.ranges, scan.intensities = self.robot.getScanRanges()
+            try:
+                scan.ranges, scan.intensities = self.robot.getScanRanges()
+            except:
+               pass
 
             # now update position information
             dt = (scan.header.stamp - then).to_sec()
