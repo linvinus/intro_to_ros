@@ -9,6 +9,8 @@
     <remap from="teleop_twist_joy/cmd_vel" to="/raw_cmd_vel"/>
   </node>
 
-  <node pkg="joy" type="joy_node" name="joystick"/>
+  <node pkg="joy" type="joy_node" name="joystick">
+    <param name="dev" value="/dev/input/js1" />
+  </node>
 
 </launch>

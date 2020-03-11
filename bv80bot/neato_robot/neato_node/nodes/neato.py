@@ -44,6 +44,8 @@ from tf.broadcaster import TransformBroadcaster
 
 from neato_driver.neato_driver import Botvac
 
+import time
+
 class NeatoNode:
 	
     def __init__(self):
@@ -93,34 +95,43 @@ class NeatoNode:
         # main loop of driver
         r = rospy.Rate(20)
         cmd_rate= self.CMD_RATE
+        # ~ self.robot.read_all2()
+        print("loop begin")
 
         while not rospy.is_shutdown():
+            time.sleep(1.0/6.0)
             # notify if low batt
             #if self.robot.getCharger() < 10:
             #    print "battery low " + str(self.robot.getCharger()) + "%"
             # get motor encoder values
+            # ~ self.robot.read_all2()
+             # ~ and not rospy.is_shutdown():
+              # ~ print(".")
+            # ~ continue
             left, right = self.robot.getMotors()
 
-            cmd_rate = cmd_rate-1
+            cmd_rate = 0#cmd_rate-1
             if cmd_rate ==0:
-		    # send updated movement commands
-		    #if self.cmd_vel != self.old_vel or self.cmd_vel == [0,0]:
-                    # max(abs(self.cmd_vel[0]),abs(self.cmd_vel[1])))
-		    #self.robot.setMotors(self.cmd_vel[0], self.cmd_vel[1], (abs(self.cmd_vel[0])+abs(self.cmd_vel[1]))/2)
-		    self.robot.setMotors(self.cmd_vel[0], self.cmd_vel[1], max(abs(self.cmd_vel[0]),abs(self.cmd_vel[1])))
-		    cmd_rate = self.CMD_RATE
+                # send updated movement commands
+                #if self.cmd_vel != self.old_vel or self.cmd_vel == [0,0]:
+                            # max(abs(self.cmd_vel[0]),abs(self.cmd_vel[1])))
+                #self.robot.setMotors(self.cmd_vel[0], self.cmd_vel[1], (abs(self.cmd_vel[0])+abs(self.cmd_vel[1]))/2)
+                self.robot.setMotors(self.cmd_vel[0], self.cmd_vel[1], max(abs(self.cmd_vel[0]),abs(self.cmd_vel[1])))
+                cmd_rate = self.CMD_RATE
 
             self.old_vel = self.cmd_vel
 
             # prepare laser scan
             scan.header.stamp = rospy.Time.now()
            
-            self.robot.requestScan()
+            # ~ self.robot.requestScan()
             try:
                 scan.ranges, scan.intensities = self.robot.getScanRanges()
             except:
                if rospy.is_shutdown():
                    pass
+                   
+            # ~ print(scan.intensities)
 
             # now update position information
             dt = (scan.header.stamp - then).to_sec()
@@ -130,7 +141,7 @@ class NeatoNode:
             d_right =  (right - encoders[1])/1000.0
             encoders = [left, right]
 
-	    #print d_left, d_right, encoders
+            #print (d_left, d_right, encoders)
 
             dx = (d_left+d_right)/2
             dth = (d_right-d_left)/(self.robot.base_width/1000.0)
@@ -190,6 +201,7 @@ class NeatoNode:
         self.robot.setLED("Off")
         self.robot.setLDS("off")
         self.robot.setTestMode("off")
+        self.robot.exit()
 
     def sign(self,a):
         if a>=0:

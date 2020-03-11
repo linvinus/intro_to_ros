@@ -19,7 +19,7 @@ local_costmap:
   robot_base_frame: base_footprint
   
   inflation_layer:
-    inflation_radius: 0.26
+    inflation_radius: 0.13
     cost_scaling_factor: 9.0
 
 
